@@ -63,9 +63,9 @@ with st.form("promotion_form"):
     education = st.selectbox("Education", ["Below Secondary", "Bachelor's", "Master's & above"])
     previous_year_rating = st.selectbox("Previous Year Rating", [0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
     no_of_trainings = st.slider("Number of Trainings", 1, 10, 1)
-    age = st.slider("Age", 20, 60, 30)
-    length_of_service = st.slider("Length of Service (Years)", 1, 35, 5)
-    avg_training_score = st.slider("Average Training Score", 40, 100, 70)
+    age = st.slider("Age", 20, 60, 1)
+    length_of_service = st.slider("Length of Service (Years)", 1, 35, 1)
+    avg_training_score = st.slider("Average Training Score", 0, 100, 1)
     awards_won = st.selectbox("Awards Won?", [0, 1])
 
     submitted = st.form_submit_button("Predict Promotion")
