@@ -1,7 +1,50 @@
 import streamlit as st
 import pandas as pd
 import pickle
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.preprocessing import OrdinalEncoder
+import numpy as np
 
+# =======================================
+# Define Custom Transformers
+# =======================================
+class EducationImputer(BaseEstimator, TransformerMixin):
+    def fit(self, X, y=None):
+        return self
+    
+    def transform(self, X):
+        X['education'] = X['education'].fillna('Unknown')
+        return X
+
+class PreviousYearRatingImputer(BaseEstimator, TransformerMixin):
+    def fit(self, X, y=None):
+        return self
+    
+    def transform(self, X):
+        X['previous_year_rating'] = X['previous_year_rating'].fillna(1.0)
+        return X
+
+class EducationOrdinalEncoder(BaseEstimator, TransformerMixin):
+    def __init__(self):
+        self.encoder = OrdinalEncoder(categories=[['Below Secondary', "Bachelor's", "Master's & above"]])
+    
+    def fit(self, X, y=None):
+        self.encoder.fit(X[['education']])
+        return self
+    
+    def transform(self, X):
+        X['education'] = self.encoder.transform(X[['education']])
+        return X
+
+# =======================================
+# Load final XGBoost model pipeline
+# =======================================
+def load_model():
+    with open("best_model_pipeline.pkl", "rb") as f:
+        return pickle.load(f)
+
+model = load_model()
+best_threshold = 0.6
 
 # =======================================
 # Streamlit App Interface
@@ -46,12 +89,7 @@ if submitted:
 # =======================================
 # Load final XGBoost model pipeline
 # =======================================
-def load_model():
-    with open("best_model_pipeline.pkl", "rb") as f:
-        return pickle.load(f)
-
-model = load_model()
-best_threshold = 0.6
+# Ensure this is ALL indented under the if-block
     proba = model.predict_proba(input_data)[0][1]
     prediction = int(proba >= best_threshold)
 
