@@ -59,7 +59,7 @@ with st.form("promotion_form"):
     department = st.selectbox("Department", [
         "Sales & Marketing", "Operations", "Technology", "HR", "Finance", "Procurement", "R&D"
     ])
-    region = st.selectbox("Region", [f"region_{i}" for i in range(6)])  # Based on region_0 to region_5
+    region = st.selectbox("Region", [f"region_{i}" for i in range(40)])
     education = st.selectbox("Education", ["Below Secondary", "Bachelor's", "Master's & above"])
     previous_year_rating = st.selectbox("Previous Year Rating", [0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
     no_of_trainings = st.slider("Number of Trainings", 1, 10, 1)
