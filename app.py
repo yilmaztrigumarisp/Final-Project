@@ -2,16 +2,6 @@ import streamlit as st
 import pandas as pd
 import pickle
 
-# =======================================
-# Load final XGBoost model pipeline
-# =======================================
-@st.cache_resource
-def load_model():
-    with open("best_model_pipeline.pkl", "rb") as f:
-        return pickle.load(f)
-
-model = load_model()
-best_threshold = 0.6
 
 # =======================================
 # Streamlit App Interface
@@ -52,10 +42,21 @@ if submitted:
         "avg_training_score": avg_training_score,
         "awards_won": awards_won
     }])
+    
+# =======================================
+# Load final XGBoost model pipeline
+# =======================================
+def load_model():
+    with open("best_model_pipeline.pkl", "rb") as f:
+        return pickle.load(f)
 
+model = load_model()
+best_threshold = 0.6
     proba = model.predict_proba(input_data)[0][1]
     prediction = int(proba >= best_threshold)
 
     st.subheader("Prediction Result:")
     st.write("✅ Promoted" if prediction == 1 else "❌ Not Promoted")
     st.write(f"Promotion Probability: **{proba:.2%}** (Threshold = {best_threshold})")
+
+
