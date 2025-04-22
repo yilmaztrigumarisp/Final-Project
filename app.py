@@ -57,7 +57,7 @@ st.markdown("Enter employee data to predict promotion eligibility.")
 # =======================================
 with st.form("promotion_form"):
     department = st.selectbox("Department", [
-        "Sales & Marketing", "Operations", "Technology", "HR", "Finance", "Procurement", "R&D"
+        "Sales & Marketing", "Operations", "Technology", "HR", "Finance", "Procurement", "R&D", "Legal", "Analytics"
     ])
     region = st.selectbox("Region", [f"region_{i}" for i in range(40)])
     education = st.selectbox("Education", ["Below Secondary", "Bachelor's", "Master's & above"])
