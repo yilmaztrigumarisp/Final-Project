@@ -2,45 +2,60 @@ import streamlit as st
 import pandas as pd
 import pickle
 
-# Load model
+# =======================================
+# Load final XGBoost model pipeline
+# =======================================
 @st.cache_resource
 def load_model():
     with open("best_model_pipeline.pkl", "rb") as f:
         return pickle.load(f)
 
 model = load_model()
+best_threshold = 0.6
 
-# App title
-st.title("Employee Attrition Prediction")
+# =======================================
+# Streamlit App Interface
+# =======================================
+st.title("HR Promotion Prediction")
+st.markdown("Enter employee data to predict promotion eligibility.")
 
-# User input
-st.header("Enter Employee Data")
+# =======================================
+# Input Form
+# =======================================
+with st.form("promotion_form"):
+    department = st.selectbox("Department", [
+        "Sales & Marketing", "Operations", "Technology", "HR", "Finance", "Procurement", "R&D"
+    ])
+    region = st.selectbox("Region", [f"region_{i}" for i in range(6)])  # Based on region_0 to region_5
+    education = st.selectbox("Education", ["Below Secondary", "Bachelor's", "Master's & above"])
+    previous_year_rating = st.selectbox("Previous Year Rating", [0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
+    no_of_trainings = st.slider("Number of Trainings", 1, 10, 1)
+    age = st.slider("Age", 20, 60, 30)
+    length_of_service = st.slider("Length of Service (Years)", 1, 35, 5)
+    avg_training_score = st.slider("Average Training Score", 40, 100, 70)
+    awards_won = st.selectbox("Awards Won?", [0, 1])
 
-# Sample form - adjust fields to match your dataset
-department = st.selectbox("Department", ["Sales", "Technical", "HR", "Finance"])
-region = st.selectbox("Region", ["region_1", "region_2", "region_3"])  # Example values
-education = st.selectbox("Education Level", ["Below Secondary", "Bachelor's", "Master's & above"])
-previous_year_rating = st.selectbox("Previous Year Rating", [1, 2, 3, 4, 5])
-no_of_trainings = st.slider("Number of Trainings", 1, 10, 1)
-age = st.slider("Age", 18, 60, 30)
+    submitted = st.form_submit_button("Predict Promotion")
 
-# Create input DataFrame
-input_data = pd.DataFrame({
-    "department": [department],
-    "region": [region],
-    "education": [education],
-    "previous_year_rating": [previous_year_rating],
-    "no_of_trainings": [no_of_trainings],
-    "age": [age],
-    # Add other features used in your training data
-})
+# =======================================
+# Perform Prediction
+# =======================================
+if submitted:
+    input_data = pd.DataFrame([{
+        "department": department,
+        "region": region,
+        "education": education,
+        "previous_year_rating": previous_year_rating,
+        "no_of_trainings": no_of_trainings,
+        "age": age,
+        "length_of_service": length_of_service,
+        "avg_training_score": avg_training_score,
+        "awards_won": awards_won
+    }])
 
-# Predict
-if st.button("Predict Attrition"):
-    prob = model.predict_proba(input_data)[0][1]  # Get probability of class 1
-    threshold = 0.3  # Custom threshold
-    prediction = 1 if prob >= threshold else 0
+    proba = model.predict_proba(input_data)[0][1]
+    prediction = int(proba >= best_threshold)
 
-    st.subheader("Prediction:")
-    st.write("Attrition" if prediction == 1 else "No Attrition")
-    st.write(f"Probability of Attrition: {prob:.2f}")
+    st.subheader("Prediction Result:")
+    st.write("✅ Promoted" if prediction == 1 else "❌ Not Promoted")
+    st.write(f"Promotion Probability: **{proba:.2%}** (Threshold = {best_threshold})")
